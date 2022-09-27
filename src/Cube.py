@@ -20,8 +20,6 @@
 #              |*D7**D8**D9*|
 #              |************|
 
-from tkinter import BOTTOM
-from turtle import back
 import numpy as np
 import random
 
@@ -45,15 +43,18 @@ COUNTER_CLOCKWISE = (0, 1)
 DEBUG = False
 MOVES = ["D", "D'", "D2", "E", "E'", "E2", "U", "U'", "U2", "R", "R'", "R2", "M", "M'", "M2", "L", "L'", "L2", "B", "B'", "B2", "S", "S'", "S2", "F", "F'", "F2"]
 
+
 class Cube:
-    def __init__(self, scramble) -> None:
+    def __init__(self, name, scramble) -> None:
+        self.name = name
+
         self.faces = {
-            UP: np.full((3,3), WHITE),
-            RIGHT: np.full((3,3), RED),
-            LEFT: np.full((3,3), ORANGE),
+            UP: np.full((3, 3), WHITE),
+            RIGHT: np.full((3, 3), RED),
+            LEFT: np.full((3, 3), ORANGE),
             FRONT: np.full((3, 3), GREEN),
-            BACK: np.full((3,3), BLUE),
-            DOWN: np.full((3,3), YELLOW)
+            BACK: np.full((3, 3), BLUE),
+            DOWN: np.full((3, 3), YELLOW)
         }
 
         self.moves_lookup = {
@@ -74,21 +75,23 @@ class Cube:
         }
 
         self.move_history = []
+        self.execute(scramble)
         self.fitness = 0
-        self.init_state = self.execute(scramble)
         self.random_move()
         self.random_move()
 
     def execute(self, moves):
+        if DEBUG:
+            print(f"Cube {self.name}")
         moves = moves.split(" ")
         for move in moves:
             if DEBUG:
                 print('Executing ' + move)
             self.moves_lookup[move]()
-        self.move_history.append(moves)
+            self.move_history.append(move)
         self.__calculate_fitness()
         if DEBUG:
-            print(self.faces, self.fitness)
+            print(self.move_history)
 
     def __calculate_fitness(self):
         wrong_stickers = 0
@@ -102,7 +105,6 @@ class Cube:
                         wrong_stickers += 1
 
         self.fitness = wrong_stickers
-
 
     def is_solved(self):
         return self.fitness == 0
