@@ -69,9 +69,11 @@ class Cube:
             # # z
             "B": self.B, "B'": self.B_prime, "B2": self.B2,
             "S": self.S, "S'": self.S_prime, "S2": self.S2,
-            "F": self.F, "F'": self.F_prime, "F2": self.F2
+            "F": self.F, "F'": self.F_prime, "F2": self.F2,
             # full rotations
-            # TODO
+            "x": self.x, "x'": self.x_prime, "x2": self.x2,
+            "y": self.y, "y'": self.y_prime, "y2": self.y2,
+            "z": self.z, "z'": self.z_prime, "z2": self.z2
         }
 
         self.move_history = []
@@ -83,12 +85,11 @@ class Cube:
     def execute(self, moves):
         if DEBUG:
             print(f"Cube {self.name}")
-        moves = moves.split(" ")
-        for move in moves:
-            if DEBUG:
-                print('Executing ' + move)
+            print(f"Executing {moves}")
+        #moves = moves.split(" ")
+        for move in moves.split(" "):
             self.moves_lookup[move]()
-            self.move_history.append(move)
+        self.move_history.append(moves)
         self.__calculate_fitness()
         if DEBUG:
             print(self.move_history)
@@ -277,11 +278,62 @@ class Cube:
             self.__copy_row(self.faces[t1[0]][t1[1]], self.faces[t2[0]][:, t2[1]])
 
         self.__copy_row(backup, self.faces[t1[0]][t1[1]])
-                
-    # TODO
+
     # full rotations
+    def x(self):
+        self.L_prime()
+        self.M_prime()
+        self.R()
+
+    def x_prime(self):
+        self.L()
+        self.M()
+        self.R_prime()
+
+    def x2(self):
+        self.x()
+        self.x()
+
+    def y(self):
+        self.U()
+        self.E_prime()
+        self.D_prime()
+
+    def y_prime(self):
+        self.U_prime()
+        self.E()
+        self.D()
+
+    def y2(self):
+        self.y()
+        self.y()
+
+    def z(self):
+        self.F()
+        self.S()
+        self.B_prime()
+
+    def z_prime(self):
+        self.F_prime()
+        self.S_prime()
+        self.B()
+
+    def z2(self):
+        self.z()
+        self.z()
 
     def random_move(self):
         move = MOVES[random.randint(0, len(MOVES) - 1)]
         self.execute(move)
-        self.move_history.append(move)
+        #self.move_history.append(move)
+
+    def print_solution(self):
+        move_list = [item for item in self.move_history[1:]]
+        if DEBUG:
+            print(self.move_history)
+            print(move_list)
+
+        solution = " ".join(move_list)
+        with open('solution.txt', 'w') as f:
+            f.write(solution)
+        print(f"Moves: {len(solution.split(' '))}")
